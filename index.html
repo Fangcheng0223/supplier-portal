@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>青岛优梦家居 - 供应商交流平台</title>
+<style>
+  :root {
+    --purple-dark: #2d1b4e;
+    --purple: #5b2d8e;
+    --purple-mid: #7b4ab5;
+    --purple-light: #b794e0;
+    --purple-bg: #f3edfa;
+    --white: #ffffff;
+    --text: #1a1a2e;
+    --text-light: #555;
+    --border: #e0d5f0;
+    --danger: #e74c3c;
+    --success: #27ae60;
+    --shadow: 0 2px 16px rgba(90, 45, 140, 0.12);
+    --radius: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(160deg, #3b1f6e 0%, #5b2d8e 30%, #6b3fa0 60%, #4a2578 100%);
+    min-height: 100vh;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 48px 20px 36px;
+    color: var(--white);
+  }
+  .header .icon { font-size: 48px; margin-bottom: 8px; }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: 1px; margin-bottom: 6px; }
+  .header .sub { font-size: 14px; opacity: 0.8; font-weight: 400; }
+
+  /* Stats Bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    color: var(--white);
+  }
+  .stat-card .num { font-size: 32px; font-weight: 700; }
+  .stat-card .label { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; margin-bottom: 24px; border-radius: var(--radius); overflow: hidden; }
+  .tab-btn {
+    flex: 1;
+    padding: 14px 20px;
+    border: none;
+    background: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.75);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.5px;
+  }
+  .tab-btn.active { background: var(--white); color: var(--purple); }
+  .tab-btn:hover:not(.active) { background: rgba(255,255,255,0.3); }
+
+  /* Panels */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 32px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--purple-dark);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--purple-light);
+  }
+
+  /* Form */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-grid .full { grid-column: 1 / -1; }
+  .form-group { display: flex; flex-direction: column; }
+  .form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+  .form-group label .req { color: var(--danger); margin-left: 2px; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    background: #faf8fd;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--purple-mid);
+    background: var(--white);
+  }
+  .form-group textarea { resize: vertical; min-height: 90px; }
+
+  .file-upload-area {
+    border: 2px dashed var(--purple-light);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #faf8fd;
+  }
+  .file-upload-area:hover { border-color: var(--purple-mid); background: #f3edfa; }
+  .file-upload-area .hint { font-size: 13px; color: var(--text-light); margin-top: 6px; }
+  .file-list { margin-top: 10px; font-size: 13px; color: var(--purple); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--purple); color: var(--white); }
+  .btn-primary:hover { background: var(--purple-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(91,45,142,0.4); }
+  .btn-outline { background: transparent; color: var(--purple); border: 2px solid var(--purple); }
+  .btn-outline:hover { background: var(--purple-bg); }
+  .btn-sm { padding: 6px 16px; font-size: 13px; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { background: #c0392b; }
+
+  .btn-row { display: flex; gap: 12px; margin-top: 8px; }
+
+  /* Table */
+  .table-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .search-box:focus { outline: none; border-color: var(--purple-mid); }
+  .filter-select {
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #faf8fd;
+  }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: var(--purple-bg);
+    color: var(--purple-dark);
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 700;
+    white-space: nowrap;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+  }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: #faf8fd; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-new { background: #e8f5e9; color: #2e7d32; }
+  .badge-active { background: #e3f2fd; color: #1565c0; }
+  .badge-vip { background: #fff3e0; color: #e65100; }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-light);
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+
+  /* Summary cards */
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .summary-item {
+    background: var(--purple-bg);
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 14px;
+    color: var(--purple-dark);
+    font-weight: 600;
+  }
+  .summary-item span { font-weight: 400; color: var(--text); display: block; margin-top: 4px; }
+
+  .toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--success);
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(0); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    padding-top: 32px;
+  }
+
+  @media (max-width: 768px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid .full { grid-column: 1; }
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 22px; }
+    .tabs { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="icon">🏠</div>
+    <h1>青岛优梦家居科技有限公司</h1>
+    <p class="sub">供应商交流平台 · Supplier Communication Portal</p>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="num" id="statTotal">0</div>
+      <div class="label">供应商总数</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statToday">0</div>
+      <div class="label">今日新增</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statCats">0</div>
+      <div class="label">品类覆盖</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statUnread">0</div>
+      <div class="label">待审核</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('upload')">📤 供应商资料上传</button>
+    <button class="tab-btn" onclick="switchTab('database')">📊 供应商数据库</button>
+    <button class="tab-btn" onclick="switchTab('summary')">📋 智能分析摘要</button>
+  </div>
+
+  <!-- Upload Panel -->
+  <div class="panel active" id="panelUpload">
+    <div class="card">
+      <h2>供应商信息登记</h2>
+      <form id="supplierForm" onsubmit="handleSubmit(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>公司全称 <span class="req">*</span></label>
+            <input type="text" id="companyName" placeholder="请输入公司注册全称" required>
+          </div>
+          <div class="form-group">
+            <label>品牌/简称</label>
+            <input type="text" id="brandName" placeholder="如无品牌可不填">
+          </div>
+          <div class="form-group">
+            <label>联系人姓名 <span class="req">*</span></label>
+            <input type="text" id="contactName" placeholder="请输入联系人姓名" required>
+          </div>
+          <div class="form-group">
+            <label>联系电话 <span class="req">*</span></label>
+            <input type="tel" id="contactPhone" placeholder="请输入手机号码" required>
+          </div>
+          <div class="form-group">
+            <label>联系邮箱</label>
+            <input type="email" id="contactEmail" placeholder="example@company.com">
+          </div>
+          <div class="form-group">
+            <label>公司所在地 <span class="req">*</span></label>
+            <input type="text" id="location" placeholder="省/市" required>
+          </div>
+          <div class="form-group">
+            <label>产品品类 <span class="req">*</span></label>
+            <select id="category" required>
+              <option value="">请选择主要品类</option>
+              <option value="面料/纺织">面料/纺织</option>
+              <option value="填充材料">填充材料</option>
+              <option value="床垫/芯材">床垫/芯材</option>
+              <option value="床架/五金">床架/五金</option>
+              <option value="海绵/乳胶">海绵/乳胶</option>
+              <option value="包装材料">包装材料</option>
+              <option value="塑料/注塑件">塑料/注塑件</option>
+              <option value="电子/电器配件">电子/电器配件</option>
+              <option value="物流/仓储">物流/仓储</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>公司规模</label>
+            <select id="scale">
+              <option value="">请选择</option>
+              <option value="50人以下">50人以下</option>
+              <option value="50-200人">50-200人</option>
+              <option value="200-500人">200-500人</option>
+              <option value="500人以上">500人以上</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>公司简介与核心优势 <span class="req">*</span></label>
+            <textarea id="description" placeholder="请简要介绍公司的主营业务、核心产品、产能规模、主要客户等信息" required></textarea>
+          </div>
+          <div class="form-group full">
+            <label>上传公司资料（营业执照、产品目录、资质证书等）</label>
+            <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+              <div style="font-size:32px;">📎</div>
+              <div style="font-weight:600;color:var(--purple);">点击上传 或拖拽文件到此处</div>
+              <div class="hint">支持 PDF、图片、Word 等格式，单个文件不超过 10MB</div>
+            </div>
+            <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx" style="display:none" onchange="handleFiles(this)">
+            <div class="file-list" id="fileList"></div>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:24px;">
+          <button type="submit" class="btn btn-primary">✓ 提交供应商资料</button>
+          <button type="button" class="btn btn-outline" onclick="resetForm()">清空表单</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Database Panel -->
+  <div class="panel" id="panelDatabase">
+    <div class="card">
+      <h2>供应商数据库</h2>
+      <div class="table-toolbar">
+        <input type="text" class="search-box" id="searchInput" placeholder="🔍 搜索公司名称、品类、所在地..." oninput="renderTable()">
+        <select class="filter-select" id="filterCategory" onchange="renderTable()">
+          <option value="">全部品类</option>
+          <option value="面料/纺织">面料/纺织</option>
+          <option value="填充材料">填充材料</option>
+          <option value="床垫/芯材">床垫/芯材</option>
+          <option value="床架/五金">床架/五金</option>
+          <option value="海绵/乳胶">海绵/乳胶</option>
+          <option value="包装材料">包装材料</option>
+          <option value="塑料/注塑件">塑料/注塑件</option>
+          <option value="电子/电器配件">电子/电器配件</option>
+          <option value="物流/仓储">物流/仓储</option>
+          <option value="其他">其他</option>
+        </select>
+        <select class="filter-select" id="filterStatus" onchange="renderTable()">
+          <option value="">全部状态</option>
+          <option value="new">待审核</option>
+          <option value="active">已入库</option>
+          <option value="vip">重点供应商</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="exportCSV()">📥 导出CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>编号</th>
+              <th>公司名称</th>
+              <th>品类</th>
+              <th>所在地</th>
+              <th>联系人</th>
+              <th>电话</th>
+              <th>规模</th>
+              <th>提交日期</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="10" class="empty-state"><div class="icon">📭</div>暂无供应商数据，请先上传资料</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Panel -->
+  <div class="panel" id="panelSummary">
+    <div class="card">
+      <h2>供应商智能分析摘要</h2>
+      <div class="summary-grid" id="summaryContent">
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="icon">📋</div>暂无数据可分析，请先添加供应商资料
+        </div>
+      </div>
+    </div>
+    <div class="card" id="autoSummaryCard" style="display:none;">
+      <h2>🤖 AI 自动摘要</h2>
+      <div id="autoSummary" style="font-size:14px;line-height:1.8;color:var(--text);"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    © 2026 青岛优梦家居科技有限公司 · 供应商交流平台 · 数据仅用于内部采购管理
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---- 数据存储 ----
+const STORAGE_KEY = 'youmeng_suppliers';
+
+function loadSuppliers() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveSuppliers(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+let suppliers = loadSuppliers();
+
+// ---- Toast 提示 ----
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ---- Tab 切换 ----
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['upload','database','summary'][i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel' + name.charAt(0).toUpperCase() + name.slice(1));
+  });
+  if (name === 'database') renderTable();
+  if (name === 'summary') renderSummary();
+  updateStats();
+}
+
+// ---- 文件上传 ----
+let pendingFiles = [];
+
+function handleFiles(input) {
+  pendingFiles = Array.from(input.files);
+  const list = document.getElementById('fileList');
+  if (pendingFiles.length === 0) { list.innerHTML = ''; return; }
+  const totalSize = pendingFiles.reduce((s, f) => s + f.size, 0);
+  const sizeStr = totalSize < 1048576 ? (totalSize / 1024).toFixed(1) + ' KB' : (totalSize / 1048576).toFixed(1) + ' MB';
+  list.innerHTML = '✓ 已选择 <strong>' + pendingFiles.length + '</strong> 个文件，共 <strong>' + sizeStr + '</strong>';
+}
+
+// ---- 表单提交 ----
+function handleSubmit(e) {
+  e.preventDefault();
+
+  // 检查重复（同公司名 + 同电话）
+  const dup = suppliers.find(s =>
+    s.companyName === document.getElementById('companyName').value.trim() &&
+    s.contactPhone === document.getElementById('contactPhone').value.trim()
+  );
+  if (dup) {
+    if (!confirm('该供应商已存在于数据库中，是否仍然提交？（将覆盖原记录）')) return;
+    suppliers = suppliers.filter(s => s !== dup);
+  }
+
+  const today = new Date();
+  const dateStr = today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+
+  const fileNames = pendingFiles.map(f => f.name);
+
+  const entry = {
+    id: 'YM-' + String(suppliers.length + 1).padStart(4, '0'),
+    companyName: document.getElementById('companyName').value.trim(),
+    brandName: document.getElementById('brandName').value.trim(),
+    contactName: document.getElementById('contactName').value.trim(),
+    contactPhone: document.getElementById('contactPhone').value.trim(),
+    contactEmail: document.getElementById('contactEmail').value.trim(),
+    location: document.getElementById('location').value.trim(),
+    category: document.getElementById('category').value,
+    scale: document.getElementById('scale').value,
+    description: document.getElementById('description').value.trim(),
+    files: fileNames,
+    submitDate: dateStr,
+    submitTimestamp: today.toISOString(),
+    status: 'new' // new | active | vip
+  };
+
+  suppliers.unshift(entry);
+  saveSuppliers(suppliers);
+
+  resetForm();
+  pendingFiles = [];
+  document.getElementById('fileList').innerHTML = '';
+
+  updateStats();
+  showToast('供应商资料提交成功！已自动存入数据库。');
+}
+
+function resetForm() {
+  document.getElementById('supplierForm').reset();
+  pendingFiles = [];
+  document.getElementById('fileList').innerHTML = '';
+}
+
+// ---- 数据库表格渲染 ----
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const search = (document.getElementById('searchInput').value || '').toLowerCase();
+  const catFilter = document.getElementById('filterCategory').value;
+  const statusFilter = document.getElementById('filterStatus').value;
+
+  let filtered = suppliers.filter(s => {
+    const matchSearch = !search ||
+      s.companyName.toLowerCase().includes(search) ||
+      s.category.toLowerCase().includes(search) ||
+      s.location.toLowerCase().includes(search) ||
+      s.contactName.toLowerCase().includes(search) ||
+      (s.brandName && s.brandName.toLowerCase().includes(search));
+    const matchCat = !catFilter || s.category === catFilter;
+    const matchStatus = !statusFilter || s.status === statusFilter;
+    return matchSearch && matchCat && matchStatus;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><div class="icon">📭</div>暂无匹配的供应商记录</td></tr>';
+    return;
+  }
+
+  const statusBadge = {
+    new: '<span class="badge badge-new">待审核</span>',
+    active: '<span class="badge badge-active">已入库</span>',
+    vip: '<span class="badge badge-vip">重点供应商</span>'
+  };
+
+  tbody.innerHTML = filtered.map(s => `
+    <tr>
+      <td><strong>${s.id}</strong></td>
+      <td>${s.brandName ? s.companyName + '<br><small style="color:#888">品牌：' + esc(s.brandName) + '</small>' : s.companyName}</td>
+      <td>${s.category}</td>
+      <td>${s.location}</td>
+      <td>${s.contactName}</td>
+      <td>${s.contactPhone}</td>
+      <td>${s.scale || '-'}</td>
+      <td>${s.submitDate}</td>
+      <td>${statusBadge[s.status] || statusBadge.new}</td>
+      <td>
+        <select onchange="updateStatus('${s.id}', this.value)" style="padding:4px 8px;border-radius:6px;border:1px solid #ddd;font-size:12px;">
+          <option value="new" ${s.status==='new'?'selected':''}>待审核</option>
+          <option value="active" ${s.status==='active'?'selected':''}>已入库</option>
+          <option value="vip" ${s.status==='vip'?'selected':''}>重点</option>
+        </select>
+        <button class="btn btn-danger btn-sm" onclick="deleteSupplier('${s.id}')" style="margin-top:4px;" title="删除">🗑</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function updateStatus(id, newStatus) {
+  const s = suppliers.find(s => s.id === id);
+  if (s) {
+    s.status = newStatus;
+    saveSuppliers(suppliers);
+    updateStats();
+    showToast('状态已更新');
+  }
+}
+
+function deleteSupplier(id) {
+  if (!confirm('确定要删除该供应商记录吗？此操作不可恢复。')) return;
+  suppliers = suppliers.filter(s => s.id !== id);
+  saveSuppliers(suppliers);
+  updateStats();
+  renderTable();
+  showToast('已删除');
+}
+
+// ---- 分析与摘要 ----
+function renderSummary() {
+  if (suppliers.length === 0) { updateStats(); return; }
+
+  // 品类分布
+  const catCount = {};
+  suppliers.forEach(s => { catCount[s.category] = (catCount[s.category] || 0) + 1; });
+  const topCat = Object.entries(catCount).sort((a, b) => b[1] - a[1]);
+
+  // 地区分布
+  const locCount = {};
+  suppliers.forEach(s => {
+    const p = s.location.replace(/市|省|区/g, '').trim();
+    locCount[p] = (locCount[p] || 0) + 1;
+  });
+  const topLoc = Object.entries(locCount).sort((a, b) => b[1] - a[1]);
+
+  // 规模分布
+  const scaleCount = {};
+  suppliers.forEach(s => {
+    if (s.scale) scaleCount[s.scale] = (scaleCount[s.scale] || 0) + 1;
+  });
+
+  // 近30天新增
+  const now = new Date();
+  const recent = suppliers.filter(s => {
+    const sd = new Date(s.submitTimestamp);
+    return (now - sd) < 30 * 24 * 60 * 60 * 1000;
+  });
+
+  const statusCount = { new: 0, active: 0, vip: 0 };
+  suppliers.forEach(s => { statusCount[s.status]++; });
+
+  const summaryDiv = document.getElementById('summaryContent');
+  summaryDiv.innerHTML = `
+    <div class="summary-item">📦 品类覆盖数<div style="font-size:28px;font-weight:700;color:var(--purple);margin:8px 0;">${topCat.length} 个</div></div>
+    <div class="summary-item">📈 近30天新增<span>${recent.length} 家</span></div>
+    <div class="summary-item">🏆 最大品类<span>${topCat[0] ? topCat[0][0] + '（' + topCat[0][1] + '家）' : '暂无'}</span></div>
+    <div class="summary-item">📍 最多地区<span>${topLoc[0] ? topLoc[0][0] + '（' + topLoc[0][1] + '家）' : '暂无'}</span></div>
+    <div class="summary-item">✅ 已入库<span>${statusCount.active} 家</span></div>
+    <div class="summary-item">⭐ 重点供应商<span>${statusCount.vip} 家</span></div>
+    <div class="summary-item">🕐 待审核<span>${statusCount.new} 家</span></div>
+    <div class="summary-item">🏢 规模分布<span>${Object.entries(scaleCount).map(([k,v])=>k+v+'家').join('、') || '暂无'}</span></div>
+  `;
+
+  // Auto summary
+  const autoCard = document.getElementById('autoSummaryCard');
+  const autoDiv = document.getElementById('autoSummary');
+  autoCard.style.display = 'block';
+
+  const totalScale = suppliers.filter(s => s.scale).length;
+  const largeScale = suppliers.filter(s => s.scale === '200-500人' || s.scale === '500人以上').length;
+
+  autoDiv.innerHTML = `
+    <p><strong>数据库概览：</strong>目前共有 <strong>${suppliers.length}</strong> 家供应商登记在册，覆盖 <strong>${topCat.length}</strong> 个品类、<strong>${topLoc.length}</strong> 个地区。</p>
+    <p style="margin-top:10px;"><strong>品类分析：</strong>供应商最集中的品类为<strong>「${topCat[0]?.[0] || '暂无'}」</strong>（${topCat[0]?.[1] || 0}家），其次为${topCat[1] ? '「' + topCat[1][0] + '」(' + topCat[1][1] + '家）' : '暂无其他'}。${topCat.length < 5 ? '建议继续拓展更多品类的供应商资源，特别是当前覆盖较少的领域。' : '品类覆盖较为全面，建议按核心品类深挖优质供应商。'}</p>
+    <p style="margin-top:10px;"><strong>规模评估：</strong>已登记规模信息的 ${totalScale} 家企业中，${largeScale} 家为200人以上规模，占比 ${totalScale > 0 ? (largeScale / totalScale * 100).toFixed(0) : 0}%。${largeScale < totalScale * 0.3 ? '中大型供应商比例偏低，建议重点关注规模以上企业。' : '供应商规模结构较为合理。'}</p>
+    <p style="margin-top:10px;"><strong>行动建议：</strong>${statusCount.new > 0 ? '当前有 <strong>' + statusCount.new + '</strong> 家供应商待审核，请尽快完成资质评估。' : '所有供应商已审核完毕。'}建议定期与重点供应商保持沟通，并关注行业展会拓展新资源。</p>
+  `;
+
+  updateStats();
+}
+
+// ---- 统计更新 ----
+function updateStats() {
+  document.getElementById('statTotal').textContent = suppliers.length;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const todayCount = suppliers.filter(s => s.submitDate === today).length;
+  document.getElementById('statToday').textContent = todayCount;
+
+  const cats = new Set(suppliers.map(s => s.category));
+  document.getElementById('statCats').textContent = cats.size;
+
+  const unread = suppliers.filter(s => s.status === 'new').length;
+  document.getElementById('statUnread').textContent = unread;
+}
+
+// ---- 导出 CSV ----
+function exportCSV() {
+  if (suppliers.length === 0) { showToast('暂无数据可导出'); return; }
+  const headers = ['编号','公司名称','品牌/简称','品类','所在地','联系人','电话','邮箱','规模','简介','提交日期','状态'];
+  const rows = suppliers.map(s => [
+    s.id, s.companyName, s.brandName || '', s.category, s.location,
+    s.contactName, s.contactPhone, s.contactEmail || '', s.scale || '',
+    s.description.replace(/,/g, '，'), s.submitDate,
+    {new:'待审核',active:'已入库',vip:'重点供应商'}[s.status]
+  ]);
+  const csv = [headers.join(','), ...rows.map(r => r.map(c => '"' + c + '"').join(','))].join('\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '供应商数据库_' + new Date().toISOString().slice(0, 10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV 导出成功');
+}
+
+// ---- 初始化 ----
+updateStats();
+</script>
+
+</body>
+</html>
